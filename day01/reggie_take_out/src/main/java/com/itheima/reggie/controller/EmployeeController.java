@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 
 @Slf4j
 @RestController
-@RequestMapping("/employee")
+//@RequestMapping("/message")
 public class EmployeeController {
 
     @Autowired
@@ -46,7 +46,7 @@ public class EmployeeController {
      * @param employee
      * @return
      */
-    @PostMapping("/login")
+    @PostMapping("/message")
     public R<Employee> login(HttpServletRequest request,@RequestBody String employee) {
 
         // prase成json进行解析
@@ -55,6 +55,8 @@ public class EmployeeController {
 
         // 获取关键字段
         String re_Payload = (String) json2.get("payload");
+        String chat_id_reply = (String) json2.get("chatId");
+
         // System.out.print(json2);
 
         // 参数注入对象
@@ -74,7 +76,7 @@ public class EmployeeController {
             // 存储员工信息
             employeeService.save(employee_a);
             // 发送欢迎语
-            ques_0_0_pre(employee_a);
+            ques_0_0_pre(employee_a, chat_id_reply);
             return R.error("账号已添加");
         }
 
@@ -84,39 +86,39 @@ public class EmployeeController {
 
         // 验证身份后
         if (emp_question.equals("0_0")){
-            ques_0_0(employeeService,emp);
+            ques_0_0(employeeService,emp,chat_id_reply);
         }
         // 询问邮箱
         else if (emp_question.equals("1_1")) {
-            ques_1_1(employeeService,emp,re_Payload);
+            ques_1_1(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 回答邮箱，发送验证码
         else if (emp_question.equals("2_0")) {
-            ques_2_0(employeeService,emp,re_Payload);
+            ques_2_0(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 回答验证码
         else if (emp_question.equals("2_1")) {
-            ques_2_1(employeeService,emp,re_Payload);
+            ques_2_1(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 拉群
         else if (emp_question.equals("3_1")) {
-            ques_3_1(employeeService,emp,re_Payload);
+            ques_3_1(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 拉入新生群，询问本硕
         else if (emp_question.equals("4_0")) {
-            ques_4_0(employeeService,emp,re_Payload);
+            ques_4_0(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 获取本硕，询问学院
         else if (emp_question.equals("4_1")) {
-            ques_4_1(employeeService,emp,re_Payload);
+            ques_4_1(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 获取学院，显示可以加入的群聊
         else if (emp_question.equals("4_2")) {
-            ques_4_2(employeeService,emp,re_Payload);
+            ques_4_2(employeeService,emp,re_Payload,chat_id_reply);
         }
         // 获取加入群聊需求，加入群聊
         else if (emp_question.equals("4_3")) {
-            ques_4_3(employeeService,emp,re_Payload);
+            ques_4_3(employeeService,emp,re_Payload,chat_id_reply);
         }
 
 
@@ -129,17 +131,17 @@ public class EmployeeController {
     /**
      * 0_0 pre 发送欢迎语
      */
-    public static void ques_0_0_pre(Employee emp){
+    public static void ques_0_0_pre(Employee emp, String chat_id_reply){
         String send_txt = "Hihi，同学你好呀! 我是JHU学联加群小助手，很高兴为您服务。\n\n目前小助手为初始阶段，仅为23fall新生提供服务。学联目前为已有JHU邮箱的同学提供新生群，学院群以及校区群。确认系统稳定后，学联日后会增加更多微信群（公寓群，兴趣群，租房/二手群等）。\n\n若您未获取JHU邮箱后缀，您可以通过EDU后缀的邮箱进入录取群。若遇到问题，请添加学联小助手微信咨询（wx：johnshopkinscssa）\n \n如果您准备好加群了，回答大写“A”以继续";
-        response_msg(send_txt);
+        response_msg(send_txt,chat_id_reply);
     }
 
     /**
      * 检查0_0  发送是否有edu邮箱
      */
-    public static void ques_0_0(EmployeeService employeeService, Employee emp){
+    public static void ques_0_0(EmployeeService employeeService, Employee emp, String chat_id_reply){
         String send_txt = "请选择您的邮箱种类：\nA.JHU邮箱 \nB.非JHU的EDU后缀邮箱 \nC.无EDU邮箱";
-        response_msg(send_txt);
+        response_msg(send_txt,chat_id_reply);
 //        ***测试发送消息和加群功能***
 //        System.out.print("respond测试1-----通过");
 //        response_groupadd();
@@ -157,7 +159,7 @@ public class EmployeeController {
     /**
      * 检查1_1  接受存储edu信息：(1) 若A，则发送验证码；(2) 若B，则发送加群信息。(3) 若c联系管理员
      */
-    public static void ques_1_1(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_1_1(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
         // 若A，则询问邮箱
         if (re_Payload.equals("A")){
             String send_txt = "请输入您的JHU邮箱： \n\n *后缀为jh.edu/jhu.edu/jhmi.edu";
@@ -166,7 +168,7 @@ public class EmployeeController {
             emp.setStatus("em_jhu");
             employeeService.updateById(emp);
 
-            response_msg(send_txt);
+            response_msg(send_txt,chat_id_reply);
         }
         // 若B，则询问邮箱
         if (re_Payload.equals("B")){
@@ -176,7 +178,7 @@ public class EmployeeController {
             emp.setQuestion("2_0");
             employeeService.updateById(emp);
 
-            response_msg(send_txt);
+            response_msg(send_txt,chat_id_reply);
         }
         // 若C，则发送寻找管理员
 
@@ -187,7 +189,7 @@ public class EmployeeController {
             emp.setQuestion("0_0");
             employeeService.updateById(emp);
 
-            response_msg(send_txt);
+            response_msg(send_txt,chat_id_reply);
         }
 
     }
@@ -195,15 +197,15 @@ public class EmployeeController {
     /**
      * 检查2_0  接受对方输入的邮箱
      */
-    public static void ques_2_0(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_2_0(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
             if((emp.getStatus().equals("em_jhu"))&&(!re_Payload.contains("jh"))){
-                response_msg("您输入的邮箱并非是JHU邮箱，请输入正确的JHU邮箱");
-                ques_0_0(employeeService,emp);
+                response_msg("您输入的邮箱并非是JHU邮箱，请输入正确的JHU邮箱",chat_id_reply);
+                ques_0_0(employeeService,emp, chat_id_reply);
                 return;
             }
             if((emp.getStatus().equals("em_edu"))&&(!re_Payload.contains("edu"))){
-                response_msg("您输入的邮箱并非是edu邮箱，请输入正确的edu邮箱");
-                ques_0_0(employeeService,emp);
+                response_msg("您输入的邮箱并非是edu邮箱，请输入正确的edu邮箱",chat_id_reply);
+                ques_0_0(employeeService,emp, chat_id_reply);
                 return;
             }
 
@@ -217,7 +219,7 @@ public class EmployeeController {
             emp.setQuestion("2_1");
             employeeService.updateById(emp);
 
-            response_msg(send_txt);
+            response_msg(send_txt,chat_id_reply);
     }
 
 
@@ -225,7 +227,7 @@ public class EmployeeController {
     /**
      * 检查2_1  回答了验证码，检验验证码是否正确；(A)正确，拉群；(B)错误，询问是否再发送。
      */
-    public static void ques_2_1(EmployeeService employeeService, Employee emp,String re_Payload) {
+    public static void ques_2_1(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply) {
         // 获取验证码信息
         String code_from_db = emp.getVermailcode();
         // 分析Jhu 还是 edu
@@ -249,7 +251,7 @@ public class EmployeeController {
                 group_could_in.add("_23NewStu");
                 emp.setQuestion("4_0");
 
-                response_msg(send_txt);
+                response_msg(send_txt,chat_id_reply);
             }
             if (stu_status.equals("em_edu")) {
                 emp.setStatus("emv_edu");
@@ -258,7 +260,7 @@ public class EmployeeController {
                 group_could_in.add("_23offer");
                 emp.setQuestion("3_1");
 
-                response_msg(send_txt);
+                response_msg(send_txt,chat_id_reply);
             }
             // 更新
                 //转字符串
@@ -270,10 +272,10 @@ public class EmployeeController {
         } else { // 验证码错误，
             send_txt = "验证码错误，请重新输入邮箱：";
 
-            response_msg(send_txt);
+            response_msg(send_txt,chat_id_reply);
 
             // 返回询问邮箱
-            ques_0_0(employeeService, emp);
+            ques_0_0(employeeService, emp, chat_id_reply);
         }
 
     }
@@ -281,15 +283,16 @@ public class EmployeeController {
     /**
      * 检查3_1  无邮箱回答了拉群需求，则拉群
      */
-    public static void ques_3_1(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_3_1(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
         // 拉群
         String send_txt;
 
         if (re_Payload.equals("A")){
                 send_txt = "已拉您入录取群。\n\n*因代写/广告/换汇诈骗等因素，录取群会在2023Fall开学前解散。\n\n**若您在未来成功获取JHU邮箱，请返回重新验证，加入JHU学生专属社群。";
                 // 拉群
-                response_groupadd("R:10799942872593752");
-                response_msg(send_txt);
+                String wx_id = emp.getUid();
+                response_groupadd("R:10799942872593752",wx_id);
+                response_msg(send_txt,chat_id_reply);
             // 更新
             emp.setQuestion("0_0");
             employeeService.updateById(emp);
@@ -300,15 +303,16 @@ public class EmployeeController {
     /**
      * 检查4_0  jhu后缀 拉入新生群
      */
-    public static void ques_4_0(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_4_0(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
         // 拉群
         String send_txt;
 
         if (re_Payload.equals("A")){
             send_txt = "已拉您入新生群。接下来我们会问您一系列问题，以方便邀请您进入其他群。\n\n请问您是: \nA.本科\nB.DC校区硕士\nC.Bal校区硕士\nD.博士 \n\n *DC校区的硕士项目包括SAIS, 部分Carey，以及除Biotech和Film and Media之外的AAP Program。本科，博士，以及其余的硕士项目均在巴尔的摩。";
             // 拉群
-            response_groupadd("R:10769365486412508");
-            response_msg(send_txt);
+            String wx_id = emp.getUid();
+            response_groupadd("R:10769365486412508",wx_id);
+            response_msg(send_txt,chat_id_reply);
             // 更新
             emp.setQuestion("4_1");
             employeeService.updateById(emp);
@@ -320,7 +324,7 @@ public class EmployeeController {
     /**
      * 检查4_1  询问本科硕士后的返回值
      */
-    public static void ques_4_1(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_4_1(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
         // 根据不同情况分配群
         String send_txt;
         // 加入原有
@@ -372,7 +376,7 @@ public class EmployeeController {
             employeeService.updateById(emp);
 
         send_txt = "请问您是：\nA.Whiting工学院\nB.Krieger文理学院\nC.Peabody音乐学院\nD.Carey商学院\nE.SOE教育学院\nF.SAIS国际关系学院\nG.East Baltimore三院 (Bloomberg, Nursing, Medicine)";
-        response_msg(send_txt);
+        response_msg(send_txt,chat_id_reply);
 
     }
 
@@ -380,7 +384,7 @@ public class EmployeeController {
      * 检查4_2 根据学院，记录学院，显示结果
      */
 
-    public static void ques_4_2(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_4_2(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
         // 根据不同情况分配群
         String send_txt;
         // 加入原有
@@ -448,7 +452,7 @@ public class EmployeeController {
         String return_group_could_in_str = show_group_could_in(db_raw_group_could_in_str);
 
         send_txt = return_group_could_in_str;
-        response_msg(send_txt);
+        response_msg(send_txt,chat_id_reply);
 
     }
 
@@ -456,7 +460,7 @@ public class EmployeeController {
     /**
      * 检查4_3 根据学生加群意愿，加入群聊，再次显示可加入群聊页面
      */
-    public static void ques_4_3(EmployeeService employeeService, Employee emp,String re_Payload){
+    public static void ques_4_3(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
         // 先分析其回复的字母是想加入哪个群聊
         String send_txt;
         // 通过数据库raw_str分析他可加入群聊的code-list
@@ -470,16 +474,17 @@ public class EmployeeController {
 
             if ((want_group_id <= group_could_in_code.size()) && (want_group_id > 0)) {
                 // 拉群
-                response_groupadd((String) group_could_in_code.get(want_group_id - 1));
+                String wx_id = emp.getUid();
+                response_groupadd((String) group_could_in_code.get(want_group_id - 1),wx_id);
             }else{
-                response_msg("回复错误，请回复正确的数字。");
+                response_msg("回复错误，请回复正确的数字。",chat_id_reply);
                 return;
             }
         }
 
         else{
             // 若回复错字母
-            response_msg("回复错误，请回复数字。");
+            response_msg("回复错误，请回复数字。",chat_id_reply);
             return;
         }
 
@@ -491,7 +496,7 @@ public class EmployeeController {
         String return_group_could_in_str = show_group_could_in(db_raw_group_could_in_str);
 
         send_txt = "已邀请您加入群聊。"+return_group_could_in_str;
-        response_msg(send_txt);
+        response_msg(send_txt,chat_id_reply);
 
     }
 
@@ -600,7 +605,7 @@ public class EmployeeController {
     /**
      * 工具类 response：回话,返回txt
      */
-    public static void response_msg(String msg){
+    public static void response_msg(String msg, String chat_id_reply){
         String url = "https://ex-api.botorange.com/message/send";
 //        //封装消息
         HashMap text = new HashMap();
@@ -608,7 +613,7 @@ public class EmployeeController {
 //        //参数
 
         JSONObject params = new JSONObject();
-        params.put("chatId","630c18862f47ac820be4790c");
+        params.put("chatId",chat_id_reply);
         params.put("token","62c66439bacbe0a74279a6ff");
         params.put("messageType",0);
         params.put("payload",text);
@@ -619,14 +624,14 @@ public class EmployeeController {
     /**
      * 工具类 response:加群,返回txt
      */
-    public static void response_groupadd(String r_code){
+    public static void response_groupadd(String r_code, String wx_id){
         String url = "https://ex-api.botorange.com/room/addMember";
         //参数
 
         JSONObject params = new JSONObject();
         params.put("token","62c66439bacbe0a74279a6ff");
         params.put("botUserId","jhuJiaQunXiaoZhuShou");
-        params.put("contactWxid","7881300480932698");
+        params.put("contactWxid",wx_id);
         params.put("roomWxid",r_code);
 
         String result = RequestUtils.sendPost(url,params);
