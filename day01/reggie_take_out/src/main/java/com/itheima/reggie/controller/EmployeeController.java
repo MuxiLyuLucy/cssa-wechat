@@ -56,6 +56,11 @@ public class EmployeeController {
         // 获取关键字段
         String re_Payload = (String) json2.get("payload");
         String chat_id_reply = (String) json2.get("chatId");
+        String judge_room_topic = (String) json2.get("roomTopic");
+
+        if (judge_room_topic.length() != 0){
+            return R.error("账号已禁用:群消息");
+        }
 
         // System.out.print(json2);
 
