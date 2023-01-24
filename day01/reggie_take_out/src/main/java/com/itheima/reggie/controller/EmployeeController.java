@@ -49,6 +49,7 @@ public class EmployeeController {
     @PostMapping("/message")
     public R<Employee> login(HttpServletRequest request,@RequestBody String employee) {
         System.out.print("*************************************");
+        System.out.print(employee);
         // prase成json进行解析
         JSONObject json = (JSONObject) JSONObject.parse(employee);
         JSONObject json2 = (JSONObject) json.get("data");
