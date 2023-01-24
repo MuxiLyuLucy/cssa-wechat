@@ -48,11 +48,9 @@ public class EmployeeController {
      */
     @PostMapping("/message")
     public R<Employee> login(HttpServletRequest request,@RequestBody String employee) {
-
+        System.out.print("*************************************");
         // prase成json进行解析
-        System.out.println("原生的json:" + employee);
         JSONObject json = (JSONObject) JSONObject.parse(employee);
-        System.out.println("解析后的json:" + json);
         JSONObject json2 = (JSONObject) json.get("data");
 
         // 获取关键字段
@@ -60,9 +58,9 @@ public class EmployeeController {
         String chat_id_reply = (String) json2.get("chatId");
         String judge_room_topic = (String) json2.get("roomTopic");
 
-        if (judge_room_topic.length() != 0){
-            return R.error("账号已禁用:群消息");
-        }
+//        if (judge_room_topic.length() != 0){
+//            return R.error("账号已禁用:群消息");
+//        }
 
         // System.out.print(json2);
 
