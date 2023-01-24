@@ -53,10 +53,14 @@ public class EmployeeController {
         // prase成json进行解析
         JSONObject json = (JSONObject) JSONObject.parse(employee);
         JSONObject json2 = (JSONObject) json.get("data");
-
+        System.out.print("++++++++1+++++++++");
         // 获取关键字段
-        String re_Payload = (String) json2.get("payload");
+        JSONObject re_Payload_raw = (JSONObject) json2.get("payload");
+        System.out.print("++++++++1.5+++++++++");
+        String re_Payload = (String) json2.get("text");
+        System.out.print("++++++++2+++++++++");
         String chat_id_reply = (String) json2.get("chatId");
+        System.out.print("++++++++3+++++++++");
         String judge_room_topic = (String) json2.get("roomTopic");
 
 //        if (judge_room_topic.length() != 0){
