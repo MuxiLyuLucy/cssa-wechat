@@ -50,7 +50,9 @@ public class EmployeeController {
     public R<Employee> login(HttpServletRequest request,@RequestBody String employee) {
 
         // prase成json进行解析
+        System.out.println("原生的json:" + employee);
         JSONObject json = (JSONObject) JSONObject.parse(employee);
+        System.out.println("解析后的json:" + json);
         JSONObject json2 = (JSONObject) json.get("data");
 
         // 获取关键字段
