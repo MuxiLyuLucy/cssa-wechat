@@ -62,6 +62,7 @@ public class EmployeeController {
         String chat_id_reply = (String) json2.get("chatId");
         System.out.print("++++++++3+++++++++");
         String judge_room_topic = (String) json2.get("roomTopic");
+        System.out.print("++++++++4payload+++++++++"+re_Payload+"++++");
 
         if (judge_room_topic.length() != 0){
             return R.error("账号已禁用:群消息");
