@@ -57,17 +57,17 @@ public class EmployeeController {
         // 获取关键字段
         JSONObject re_Payload_raw = (JSONObject) json2.get("payload");
         System.out.print("++++++++1.5+++++++++");
-        String re_Payload = (String) json2.get("text");
+        String re_Payload = (String) re_Payload_raw.get("text");
         System.out.print("++++++++2+++++++++");
         String chat_id_reply = (String) json2.get("chatId");
         System.out.print("++++++++3+++++++++");
         String judge_room_topic = (String) json2.get("roomTopic");
 
-//        if (judge_room_topic.length() != 0){
-//            return R.error("账号已禁用:群消息");
-//        }
+        if (judge_room_topic.length() != 0){
+            return R.error("账号已禁用:群消息");
+        }
 
-        // System.out.print(json2);
+         System.out.print(json2);
 
         // 参数注入对象
         Employee employee_a = new Employee();
