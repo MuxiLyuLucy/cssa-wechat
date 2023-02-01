@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import com.itheima.reggie.controller.UtilsController;
 import com.itheima.reggie.controller.RequestUtils;
+import com.itheima.reggie.controller.sendEmail;
+
 
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +41,8 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private sendEmail mailService;
 
     /**
      * 员工登录
@@ -48,6 +52,9 @@ public class EmployeeController {
      */
     @PostMapping("/message")
     public R<Employee> login(HttpServletRequest request,@RequestBody String employee) {
+
+
+
         System.out.print("*************************************");
         System.out.print(employee);
         // prase成json进行解析
@@ -68,7 +75,7 @@ public class EmployeeController {
             return R.error("账号已禁用:群消息");
         }
 
-         System.out.print(json2);
+        System.out.print(json2);
 
         // 参数注入对象
         Employee employee_a = new Employee();
@@ -105,7 +112,7 @@ public class EmployeeController {
         }
         // 回答邮箱，发送验证码
         else if (emp_question.equals("2_0")) {
-            ques_2_0(employeeService,emp,re_Payload,chat_id_reply);
+            ques_2_0(employeeService,emp,re_Payload,chat_id_reply,mailService);
         }
         // 回答验证码
         else if (emp_question.equals("2_1")) {
@@ -208,29 +215,33 @@ public class EmployeeController {
     /**
      * 检查2_0  接受对方输入的邮箱
      */
-    public static void ques_2_0(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply){
-            if((emp.getStatus().equals("em_jhu"))&&(!re_Payload.contains("jh"))){
-                response_msg("您输入的邮箱并非是JHU邮箱，请输入正确的JHU邮箱",chat_id_reply);
-                ques_0_0(employeeService,emp, chat_id_reply);
-                return;
-            }
-            if((emp.getStatus().equals("em_edu"))&&(!re_Payload.contains("edu"))){
-                response_msg("您输入的邮箱并非是edu邮箱，请输入正确的edu邮箱",chat_id_reply);
-                ques_0_0(employeeService,emp, chat_id_reply);
-                return;
-            }
 
-            // 对方输入了邮箱
-            String send_txt = "验证码已发送，请您查看邮件。（可能在垃圾信箱）\n\n请回复x位数验证码：";
-            // 发送验证码
+    public static void ques_2_0(EmployeeService employeeService, Employee emp,String re_Payload, String chat_id_reply, sendEmail mailService){
+        if((emp.getStatus().equals("em_jhu"))&&(!re_Payload.contains("jh"))){
+            response_msg("您输入的邮箱并非是JHU邮箱，请输入正确的JHU邮箱",chat_id_reply);
+            ques_0_0(employeeService,emp, chat_id_reply);
+            return;
+        }
+        if((emp.getStatus().equals("em_edu"))&&(!re_Payload.contains("edu"))){
+            response_msg("您输入的邮箱并非是edu邮箱，请输入正确的edu邮箱",chat_id_reply);
+            ques_0_0(employeeService,emp, chat_id_reply);
+            return;
+        }
 
-            // 更新
-            emp.setEmail(re_Payload);
-            emp.setVermailcode("123");
-            emp.setQuestion("2_1");
-            employeeService.updateById(emp);
+        // 对方输入了邮箱
+        String send_txt = "验证码已发送，请您查看邮件。（可能在垃圾信箱）\n\n请回复x位数验证码：";
+        // 发送验证码
+        String num = String.valueOf((int)(Math.random()*999+1000));
+        mailService.sendSimpleMail("1730814337@qq.com",re_Payload,"验证码："+num,num);
+        System.out.println("************************发送邮件成功*************************");
 
-            response_msg(send_txt,chat_id_reply);
+        // 更新
+        emp.setEmail(re_Payload);
+        emp.setVermailcode(num);
+        emp.setQuestion("2_1");
+        employeeService.updateById(emp);
+
+        response_msg(send_txt,chat_id_reply);
     }
 
 
@@ -254,7 +265,7 @@ public class EmployeeController {
             group_could_in = Stream.of(str).collect(Collectors.toCollection(ArrayList::new));
         }
 
-        if (re_Payload.equals("123")) {
+        if (re_Payload.equals(code_from_db)) {
             if (stu_status.equals("em_jhu")) {
                 emp.setStatus("emv_jhu");
                 send_txt = "您可以加入以下群聊：\n\nA. JHU2023新生群";
@@ -274,10 +285,10 @@ public class EmployeeController {
                 response_msg(send_txt,chat_id_reply);
             }
             // 更新
-                //转字符串
+            //转字符串
             String group_could_in_str = StringUtils.join(group_could_in,",");
             emp.setGroupcanin(group_could_in_str);
-                //其他更新
+            //其他更新
             employeeService.updateById(emp);
 
         } else { // 验证码错误，
@@ -299,11 +310,11 @@ public class EmployeeController {
         String send_txt;
 
         if (re_Payload.equals("A")){
-                send_txt = "已拉您入录取群。\n\n*因代写/广告/换汇诈骗等因素，录取群会在2023Fall开学前解散。\n\n**若您在未来成功获取JHU邮箱，请返回重新验证，加入JHU学生专属社群。";
-                // 拉群
-                String wx_id = emp.getUid();
-                response_groupadd("R:10799942872593752",wx_id);
-                response_msg(send_txt,chat_id_reply);
+            send_txt = "已拉您入录取群。\n\n*因代写/广告/换汇诈骗等因素，录取群会在2023Fall开学前解散。\n\n**若您在未来成功获取JHU邮箱，请返回重新验证，加入JHU学生专属社群。";
+            // 拉群
+            String wx_id = emp.getUid();
+            response_groupadd("R:10799942872593752",wx_id);
+            response_msg(send_txt,chat_id_reply);
             // 更新
             emp.setQuestion("0_0");
             employeeService.updateById(emp);
@@ -379,12 +390,12 @@ public class EmployeeController {
         } else{
             return;
         }
-            // 更新
-            //转字符串
-            String group_could_in_str = StringUtils.join(group_could_in,",");
-            emp.setGroupcanin(group_could_in_str);
-            // 其他更新
-            employeeService.updateById(emp);
+        // 更新
+        //转字符串
+        String group_could_in_str = StringUtils.join(group_could_in,",");
+        emp.setGroupcanin(group_could_in_str);
+        // 其他更新
+        employeeService.updateById(emp);
 
         send_txt = "请问您是：\nA.Whiting工学院\nB.Krieger文理学院\nC.Peabody音乐学院\nD.Carey商学院\nE.SOE教育学院\nF.SAIS国际关系学院\nG.East Baltimore三院 (Bloomberg, Nursing, Medicine)";
         response_msg(send_txt,chat_id_reply);
