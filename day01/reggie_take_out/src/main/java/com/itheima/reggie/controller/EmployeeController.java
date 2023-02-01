@@ -60,16 +60,11 @@ public class EmployeeController {
         // prase成json进行解析
         JSONObject json = (JSONObject) JSONObject.parse(employee);
         JSONObject json2 = (JSONObject) json.get("data");
-        System.out.print("++++++++1+++++++++");
         // 获取关键字段
         JSONObject re_Payload_raw = (JSONObject) json2.get("payload");
-        System.out.print("++++++++1.5+++++++++");
         String re_Payload = (String) re_Payload_raw.get("text");
-        System.out.print("++++++++2+++++++++");
         String chat_id_reply = (String) json2.get("chatId");
-        System.out.print("++++++++3+++++++++");
         String judge_room_topic = (String) json2.get("roomTopic");
-        System.out.print("++++++++4payload+++++++++"+re_Payload+"++++");
 
         if (judge_room_topic.length() != 0){
             return R.error("账号已禁用:群消息");
@@ -93,8 +88,9 @@ public class EmployeeController {
             employee_a.setQuestion("0_0");
             // 存储员工信息
             employeeService.save(employee_a);
-            // 发送欢迎语
+            // 发送欢迎语/邮箱
             ques_0_0_pre(employee_a, chat_id_reply);
+            //ques_0_0(employeeService,emp,chat_id_reply);
             return R.error("账号已添加");
         }
 
@@ -160,12 +156,6 @@ public class EmployeeController {
     public static void ques_0_0(EmployeeService employeeService, Employee emp, String chat_id_reply){
         String send_txt = "请选择您的邮箱种类：\nA.JHU邮箱 \nB.非JHU的EDU后缀邮箱 \nC.无EDU邮箱";
         response_msg(send_txt,chat_id_reply);
-//        ***测试发送消息和加群功能***
-//        System.out.print("respond测试1-----通过");
-//        response_groupadd();
-//        System.out.print("respond测试2-----通过");
-//        response_msg(send_txt);
-//        System.out.print("respond测试3-----通过");
         // 更新
         emp.setQuestion("1_1");
         // 测试的时候修改
@@ -229,7 +219,7 @@ public class EmployeeController {
         }
 
         // 对方输入了邮箱
-        String send_txt = "验证码已发送，请您查看邮件。（可能在垃圾信箱）\n\n请回复x位数验证码：";
+        String send_txt = "验证码已发送，请您查看邮件。（可能在垃圾信箱）\n\n请回复4位数验证码：";
         // 发送验证码
         String num = String.valueOf((int)(Math.random()*999+1000));
         mailService.sendSimpleMail("1730814337@qq.com",re_Payload,"验证码："+num,num);
