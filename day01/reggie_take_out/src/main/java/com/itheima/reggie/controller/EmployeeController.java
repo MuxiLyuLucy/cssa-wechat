@@ -97,6 +97,11 @@ public class EmployeeController {
         // 查询到：寻找相对应的题号
         String emp_question = emp.getQuestion();
 
+        // 若为R，返回验证身份0_0环节
+        if ((re_Payload == "R")&&(!emp_question.equals("4_2"))&&(!emp_question.equals("4_3"))){
+            ques_0_0(employeeService,emp,chat_id_reply);
+            return R.error("已经重启:"+emp_question);
+        }
 
         // 验证身份后
         if (emp_question.equals("0_0")){
@@ -146,7 +151,7 @@ public class EmployeeController {
      * 0_0 pre 发送欢迎语
      */
     public static void ques_0_0_pre(Employee emp, String chat_id_reply){
-        String send_txt = "Hihi，同学你好呀! 我是JHU学联加群小助手，很高兴为您服务。\n\n目前小助手为初始阶段，仅为23fall新生提供服务。学联目前为已有JHU邮箱的同学提供新生群，学院群以及校区群。确认系统稳定后，学联日后会增加更多微信群（公寓群，兴趣群，租房/二手群等）。\n\n若您未获取JHU邮箱后缀，您可以通过EDU后缀的邮箱进入录取群。若遇到问题，请添加学联小助手微信咨询（wx：johnshopkinscssa）\n \n如果您准备好加群了，回答大写“A”以继续";
+        String send_txt = "Hihi，同学你好呀! 我是JHU学联加群小助手，很高兴为您服务。\n\n目前小助手为初始阶段，仅为23fall新生提供服务。学联目前为已有JHU邮箱的同学提供新生群，学院群以及校区群。确认系统稳定后，学联日后会增加更多微信群（公寓群，兴趣群，租房/二手群等）。\n\n若您未获取JHU邮箱后缀，您可以通过EDU后缀的邮箱进入录取群。若遇到问题，请添加学联小助手微信咨询（wx：johnshopkinscssa）\n \n如果您准备好加群了，回答大写“A”以继续。途中如果输入错误，您可以输入大写“R”以重启本次对话。";
         response_msg(send_txt,chat_id_reply);
     }
 
@@ -222,7 +227,7 @@ public class EmployeeController {
         String send_txt = "验证码已发送，请您查看邮件。（可能在垃圾信箱）\n\n请回复4位数验证码：";
         // 发送验证码
         String num = String.valueOf((int)(Math.random()*999+1000));
-        mailService.sendSimpleMail("1730814337@qq.com",re_Payload,"验证码："+num,num);
+        mailService.sendSimpleMail("1730814337@qq.com",re_Payload,"JHU加群验证码："+num,"JHU加群验证码："+num);
         System.out.println("************************发送邮件成功*************************");
 
         // 更新
