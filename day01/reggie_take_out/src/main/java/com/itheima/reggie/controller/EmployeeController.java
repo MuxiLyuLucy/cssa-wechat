@@ -287,7 +287,7 @@ public class EmployeeController {
             employeeService.updateById(emp);
 
         } else { // 验证码错误，
-            send_txt = "验证码错误，请重新输入邮箱：";
+            send_txt = "验证码错误，请重新选择邮箱类型。";
 
             response_msg(send_txt,chat_id_reply);
 
