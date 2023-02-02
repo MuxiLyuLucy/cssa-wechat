@@ -98,48 +98,48 @@ public class EmployeeController {
         String emp_question = emp.getQuestion();
 
         // 若为R，返回验证身份0_0环节
-        if ((re_Payload == "R")&&(!emp_question.equals("4_3"))){
+        if ((re_Payload.equals("R"))&&(!emp_question.equals("4_3"))){
             ques_0_0(employeeService,emp,chat_id_reply);
             return R.error("已经重启:"+emp_question);
-        }
+        }else {
 
-        // 验证身份后
-        if (emp_question.equals("0_0")){
-            ques_0_0(employeeService,emp,chat_id_reply);
+            // 验证身份后
+            if (emp_question.equals("0_0")) {
+                ques_0_0(employeeService, emp, chat_id_reply);
+            }
+            // 询问邮箱
+            else if (emp_question.equals("1_1")) {
+                ques_1_1(employeeService, emp, re_Payload, chat_id_reply);
+            }
+            // 回答邮箱，发送验证码
+            else if (emp_question.equals("2_0")) {
+                ques_2_0(employeeService, emp, re_Payload, chat_id_reply, mailService);
+            }
+            // 回答验证码
+            else if (emp_question.equals("2_1")) {
+                ques_2_1(employeeService, emp, re_Payload, chat_id_reply);
+            }
+            // 拉群
+            else if (emp_question.equals("3_1")) {
+                ques_3_1(employeeService, emp, re_Payload, chat_id_reply);
+            }
+            // 拉入新生群，询问本硕
+            else if (emp_question.equals("4_0")) {
+                ques_4_0(employeeService, emp, re_Payload, chat_id_reply);
+            }
+            // 获取本硕，询问学院
+            else if (emp_question.equals("4_1")) {
+                ques_4_1(employeeService, emp, re_Payload, chat_id_reply);
+            }
+            // 获取学院，显示可以加入的群聊
+            else if (emp_question.equals("4_2")) {
+                ques_4_2(employeeService, emp, re_Payload, chat_id_reply);
+            }
+            // 获取加入群聊需求，加入群聊
+            else if (emp_question.equals("4_3")) {
+                ques_4_3(employeeService, emp, re_Payload, chat_id_reply);
+            }
         }
-        // 询问邮箱
-        else if (emp_question.equals("1_1")) {
-            ques_1_1(employeeService,emp,re_Payload,chat_id_reply);
-        }
-        // 回答邮箱，发送验证码
-        else if (emp_question.equals("2_0")) {
-            ques_2_0(employeeService,emp,re_Payload,chat_id_reply,mailService);
-        }
-        // 回答验证码
-        else if (emp_question.equals("2_1")) {
-            ques_2_1(employeeService,emp,re_Payload,chat_id_reply);
-        }
-        // 拉群
-        else if (emp_question.equals("3_1")) {
-            ques_3_1(employeeService,emp,re_Payload,chat_id_reply);
-        }
-        // 拉入新生群，询问本硕
-        else if (emp_question.equals("4_0")) {
-            ques_4_0(employeeService,emp,re_Payload,chat_id_reply);
-        }
-        // 获取本硕，询问学院
-        else if (emp_question.equals("4_1")) {
-            ques_4_1(employeeService,emp,re_Payload,chat_id_reply);
-        }
-        // 获取学院，显示可以加入的群聊
-        else if (emp_question.equals("4_2")) {
-            ques_4_2(employeeService,emp,re_Payload,chat_id_reply);
-        }
-        // 获取加入群聊需求，加入群聊
-        else if (emp_question.equals("4_3")) {
-            ques_4_3(employeeService,emp,re_Payload,chat_id_reply);
-        }
-
 
 
         return R.error("账号已禁用:"+emp_question);
