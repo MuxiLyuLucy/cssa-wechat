@@ -98,7 +98,7 @@ public class EmployeeController {
         String emp_question = emp.getQuestion();
 
         // 若为R，返回验证身份0_0环节
-        if ((re_Payload == "R")&&(!emp_question.equals("4_2"))&&(!emp_question.equals("4_3"))){
+        if ((re_Payload == "R")&&(!emp_question.equals("4_3"))){
             ques_0_0(employeeService,emp,chat_id_reply);
             return R.error("已经重启:"+emp_question);
         }
